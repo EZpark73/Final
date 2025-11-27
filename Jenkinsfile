@@ -42,10 +42,29 @@ EOF
             }
         }
 
-        stage('Health Check') {
+        stage('Wait for API') {
             steps {
-                sh "sleep 10"
-                sh "curl -f http://localhost:3001/health"
+                script {
+                    echo "Waiting for API to be healthy..."
+                    timeout(time: 120, unit: 'SECONDS') {  // รอได้สูงสุด 2 นาที
+                        waitUntil {
+                            def status = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/health || echo 000", returnStdout: true).trim()
+                            if (status == "200") {
+                                echo "API is ready!"
+                                return true
+                            } else {
+                                echo "API not ready yet (status: ${status}), retrying..."
+                                sleep 5
+                                return false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Test API') {
+            steps {
                 sh "curl -f http://localhost:3001/items"
             }
         }
@@ -53,5 +72,6 @@ EOF
 
     post {
         success { echo "Deployment OK!" }
+        failure { echo "Deployment FAILED!" }
     }
 }
