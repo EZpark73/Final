@@ -11,6 +11,8 @@ export default function Home() {
     description: "",
     price: 0,
     quantity: 0,
+    created_at: "",
+    updated_at: "",
   });
   const [editingId, setEditingId] = useState(null);
 
@@ -31,7 +33,7 @@ export default function Home() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setForm({ name: "", description: "", price: 0, quantity: 0 });
+    setForm({ name: "", description: "", price: 0, quantity: 0, created_at: "", updated_at: "" });
     loadItems();
   };
 
@@ -49,17 +51,19 @@ export default function Home() {
       description: item.description,
       price: item.price,
       quantity: item.quantity,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
     });
   };
 
-  // อัปเดต item โดยไม่เปลี่ยน id
+  // อัปเดต item
   const update = async () => {
     await fetch(`${API}/${editingId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setForm({ name: "", description: "", price: 0, quantity: 0 });
+    setForm({ name: "", description: "", price: 0, quantity: 0, created_at: "", updated_at: "" });
     setEditingId(null);
     loadItems();
   };
@@ -101,6 +105,9 @@ export default function Home() {
         </div>
         <div className="form-subheader">
           <h3>{editingId ? "แก้ไขสินค้า" : "เพิ่มสินค้าใหม่"}</h3>
+          {editingId && form.updated_at && (
+            <p>อัปเดตล่าสุด: {new Date(form.updated_at).toLocaleString()}</p>
+          )}
         </div>
 
         <div className="form-grid">
@@ -156,7 +163,7 @@ export default function Home() {
             className="btn btn-cancel"
             style={{ marginLeft: "8px" }}
             onClick={() => {
-              setForm({ name: "", description: "", price: 0, quantity: 0 });
+              setForm({ name: "", description: "", price: 0, quantity: 0, created_at: "", updated_at: "" });
               setEditingId(null);
             }}
           >
@@ -186,7 +193,13 @@ export default function Home() {
                   <div className="card-title">{item.name}</div>
                   <div className="badge">{item.quantity} ชิ้น</div>
                 </div>
-                <div className="card-meta">{item.description}</div>
+                <div className="card-meta">
+                  {item.description}
+                  <div className="item-dates">
+                    <small>สร้าง: {new Date(item.created_at).toLocaleString()}</small><br/>
+                    <small>แก้ไขล่าสุด: {new Date(item.updated_at).toLocaleString()}</small>
+                  </div>
+                </div>
                 <div className="card-price">
                   <div className="price-tag">฿{item.price.toLocaleString()}</div>
                   <div className="price-total">
