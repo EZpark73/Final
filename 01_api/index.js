@@ -25,7 +25,8 @@ app.get('/health', async (req, res) => {
     const [rows] = await pool.query("SELECT 1 AS ok");
     res.json({ status: "ok", db: rows[0].ok === 1 });
   } catch (e) {
-    res.status(500).json({ status: "error" });
+    console.error("DB ERROR:", e);  // <-- เพิ่มตรงนี้เพื่อดู error จริง
+    res.status(500).json({ status: "error", message: e.message }); // <-- ส่ง error กลับไปด้วย
   }
 });
 
@@ -63,7 +64,7 @@ app.delete('/items/:id', async (req, res) => {
   res.json({ message: "deleted" });
 });
 
-const port = Number(process.env.PORT || 3001);
+const port = Number(process.env.API_PORT || 3001);
 app.listen(port, () =>
   console.log(`API listening on http://localhost:${port}`)
 );

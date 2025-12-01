@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "📦 Item Manager",
+  title: "Item Manager",
   description: "จัดการสินค้าและคลังสินค้า",
   icons: {
     icon: "/download.png", // ตรงนี้จะชี้ไปไฟล์ใน public/
